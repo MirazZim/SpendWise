@@ -5,6 +5,9 @@ import { sql } from "./config/db.js";
 
 const app = express();
 
+//Middleware
+app.use(express.json());
+
 const PORT = process.env.PORT || 8001;
 
 
@@ -33,8 +36,28 @@ async function initDB() {
 //SO 123456789.12 IS VALID
 //BUT 12345678912 IS NOT VALID
 
-app.get("/", (req, res) => {
-    res.send("Tere Naina");
+app.post("/api/transactions", async(req, res) => {
+    try {
+        const {user_id, title, amount, category} = req.body;
+
+        if(!user_id || !title || !amount || !category) {
+            return res.status(400).json({message: "All fields are required"});
+        }
+
+        const transaction = await sql`
+            INSERT INTO transactions(user_id, title, amount, category)
+            VALUES(${user_id}, ${title}, ${amount}, ${category})
+            RETURNING *
+        `
+
+        console.log(transaction);
+
+        res.status(201).json(transaction[0]);
+
+    } catch (error) {
+        console.error("Error adding transaction:", error);
+        res.status(500).json({message: "Failed to add transaction"});
+    }
 })
 
 initDB().then(() => {
