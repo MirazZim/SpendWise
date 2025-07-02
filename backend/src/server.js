@@ -107,6 +107,43 @@ app.delete("/api/transactions/:id", async(req, res) => {
     }
 })
 
+app.get("/api/transactions/summary/:user_id", async(req, res) => {
+    try {
+        const {user_id} = req.params;
+        const balanceResult = await sql`
+            SELECT COALESCE(SUM(amount), 0) as balance
+            FROM transactions
+            WHERE user_id = ${user_id}
+        `
+
+        const incomeResult = await sql`
+            SELECT COALESCE(SUM(amount), 0) as income
+            FROM transactions
+            WHERE user_id = ${user_id}
+            AND amount > 0
+        `
+
+        const expensesResult = await sql`
+            SELECT COALESCE(SUM(amount), 0) as expenses
+            FROM transactions
+            WHERE user_id = ${user_id}
+            AND amount < 0
+        `
+
+        const balance = balanceResult[0].balance;
+        const income = incomeResult[0].income;
+        const expenses = expensesResult[0].expenses;
+
+        console.log(balance, income, expenses);   
+
+        res.status(200).json({balance, income, expenses});
+
+    } catch (error) {
+        console.error("Error fetching transaction summary:", error);
+        res.status(500).json({message: "Failed to fetch transaction summary"});
+    }
+})
+
 initDB().then(() => {
     app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
