@@ -36,9 +36,11 @@ export default function SignUpScreen() {
       // and capture OTP code
       setPendingVerification(true)
     } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
+      if(err.errors?.[0]?.code === "form_identifier_exists") {
+        setError('Email already exists. Please try another email.');
+      } else {
+        setError('Something went wrong')
+      }
     }
   }
 
@@ -63,9 +65,11 @@ export default function SignUpScreen() {
         console.error(JSON.stringify(signUpAttempt, null, 2))
       }
     } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
+      if(err.errors?.[0]?.code === "form_identifier_exists") {
+        setError('Email already exists. Please try again.');
+      } else {
+        setError('Something went wrong')
+      }
     }
   }
 
