@@ -59,4 +59,4 @@ const coffeeTheme = {
   };
   
   // 👇 change this to switch theme
-  export const COLORS = THEMES.purple;
+  export const COLORS = THEMES.coffee;
