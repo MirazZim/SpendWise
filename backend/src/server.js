@@ -2,10 +2,18 @@ import express from "express";
 import { initDB } from "./config/db.js";
 import rateLimiter from "./middleware/rateLimiter.js";
 import transactionsRoute from "./routes/transactionsRoute.js";
-
+import cors from "cors";
 const app = express();
 
+
 //Middleware
+app.use(cors({
+    origin: ['http://localhost:8081', 'http://localhost:3000'], // Add your frontend URLs
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(rateLimiter);
 app.use(express.json());
 
